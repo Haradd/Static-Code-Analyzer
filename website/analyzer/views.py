@@ -69,7 +69,7 @@ def upload_form(request):
 
 
         return render(request, 'analyzer/upload.html', {
-                'report': report_pdf
+                'report': report.file
             })
 
     return render(request, 'analyzer/upload.html')
