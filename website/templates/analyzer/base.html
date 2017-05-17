@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <title>Smart Code Analyzer</title>
+    {% load staticfiles %}
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'analyzer/style.css' %}"/>
+
+</head>
+<body>
+
+    <nav class="navbar navbar-default">
+      <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+
+          <ul class="nav navbar-nav">
+            <li><a href="{% url 'analyzer:reports' %}">Reports</a></li>
+            <li><a href="{% url 'analyzer:upload' %}" > Add project</a></li>
+          </ul>
+          <div class="nav navbar-nav navbar-right">
+            <a class="navbar-brand" href="#">Smart Code Analyzer</a>
+          </div>
+
+      </div><!-- /.container-fluid -->
+    </nav>
+
+    {% block content %}
+    {% endblock %}
+
+
+</body>
+</html>
