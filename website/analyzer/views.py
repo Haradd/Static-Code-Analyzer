@@ -9,10 +9,8 @@ from .functions import analyze, make_pdf
 import os
 
 
-
-
 def reports(request):
-    reports_list = Report.objects.all()
+    reports_list = Report.objects.order_by('-date')
     context = {'reports_list': reports_list}
     return render(request, 'analyzer/reports.html', context)
 
@@ -37,16 +35,12 @@ def upload_form(request):
                     'error_message': 'Please select only python files',
                 })
 
-
-
         #checkers selection
         checker_options = ','.join(request.POST.getlist('checker_option'))
         if checker_options == '':  #if user didn't chose any option, take all
             checker_options = 'W,E,F'
         maccabe_complexity = ','.join(request.POST.getlist('maccabe-option'))
-        print(maccabe_complexity)
         options = ['--count', '--max-complexity={}'.format(maccabe_complexity), '--select C,{}'.format(checker_options), '--statistics', '--format=pylint']
-        print(request.POST.getlist('checker_option'))
 
         # save and analyze each uploaded file
         fs = FileSystemStorage()
@@ -54,8 +48,6 @@ def upload_form(request):
             path = fs.save('files/{}'.format(file.name), file)
             path = 'media/' + path
             analyze(path, options)
-
-
 
         name = request.POST['project-name']
         report_txt = BASE_DIR + '/media/report.txt'
