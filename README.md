@@ -13,6 +13,7 @@ Getting Started
 4. Install pdfkit: ``pip install pdfkit``
 5. Instal wkhtml: ``sudo apt-get install wkhtmltopdf``
 
+
 ### or use included virtualenv ###
 1. Activate the virtualenv: ``source virtualenv/bin/activate``
 2. Run the server: ``python manage.py runserver``
