@@ -1,18 +1,22 @@
 from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse
 from django.core.files.storage import FileSystemStorage
 from django.core.files import File
 
 from .models import Report
+from .forms import UserForm
 from .functions import analyze, make_pdf
 
 import os
 
 
 def reports(request):
-    reports_list = Report.objects.order_by('-date')
-    context = {'reports_list': reports_list}
-    return render(request, 'analyzer/reports.html', context)
+    if not request.user.is_authenticated():
+        return render(request, 'analyzer/login.html')
+    else:
+        reports_list = Report.objects.filter(user=request.user).order_by('-date')
+        return render(request, 'analyzer/reports.html', {'reports_list': reports_list})
 
 
 def upload_form(request):
@@ -72,4 +76,47 @@ def upload_form(request):
                 'report': report.file
             })
 
+    return render(request, 'analyzer/upload.html')
+
+
+def register_user(request):
+    form = UserForm(request.POST or None)
+    if form.is_valid():
+        user = form.save(commit=False)
+        username = form.cleaned_data['username']
+        password = form.cleaned_data['password']
+        user.set_password(password)
+        user.save()
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            if user.is_active:
+                login(request, user)
+                reports_list = Report.objects.filter(user=request.user)
+                return render(request, 'analyzer/reports.html', {'reports_list': reports_list})
+    return render(request, 'analyzer/register.html', {"form": form})
+
+
+def login_user(request):
+    if request.method == "POST":
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            if user.is_active:
+                login(request, user)
+                reports_list = Report.objects.filter(user=request.user)
+                return render(request, 'analyzer/reports.html', {'reports_list': reports_list})
+            else:
+                return render(request, 'analyzer/login.html', {'error_message': 'Your account has been disabled'})
+        else:
+            return render(request, 'analyzer/login.html', {'error_message': 'Invalid login'})
+    return render(request, 'analyzer/login.html')
+
+
+def logout_user(request):
+    logout(request)
+    form = UserForm(request.POST or None)
+    context = {
+        "form": form,
+    }
     return render(request, 'analyzer/upload.html')

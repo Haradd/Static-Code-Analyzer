@@ -1,9 +1,10 @@
 {% extends 'analyzer/base.html' %}
+{% block reports_active %}active{% endblock %}
 
 {% block content %}
 <div class="container" id="reports">
 
-    <h3>Reports</h3>
+    <h3>My reports</h3>
     {% if reports_list %}
     <div class="list-group">
         {% for report in reports_list %}
