@@ -9,9 +9,10 @@ Getting Started
 ### Initial Setup ###
 1. Make a new virtualenv: ``virtualenv env``
 2. Activate the virtualenv: ``source env/bin/activate``
-3. Install Django: ``pip install Django``
-4. Install pdfkit: ``pip install pdfkit``
-5. Instal wkhtml: ``sudo apt-get install wkhtmltopdf``
+3. Install Django: ``pip install django==1.11``
+4. Install flake8: ``pip install flake8``
+5. Install pdfkit: ``pip install pdfkit``
+6. Instal wkhtml: ``sudo apt-get install wkhtmltopdf``
 
 
 ### or use included virtualenv ###
