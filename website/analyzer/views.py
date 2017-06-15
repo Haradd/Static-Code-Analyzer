@@ -1,8 +1,6 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.contrib.auth import authenticate, login, logout
-from django.http import HttpResponse
 from django.core.files.storage import FileSystemStorage
-from django.core.files import File
 
 from .models import Report
 from .forms import UserForm
@@ -106,7 +104,7 @@ def login_user(request):
         if user is not None:
             if user.is_active:
                 login(request, user)
-                reports_list = Report.objects.filter(user=request.user)
+                reports_list = Report.objects.filter(user=request.user).order_by('-date')
                 return render(request, 'analyzer/reports.html', {'reports_list': reports_list})
             else:
                 return render(request, 'analyzer/login.html', {'error_message': 'Your account has been disabled'})
@@ -117,8 +115,5 @@ def login_user(request):
 
 def logout_user(request):
     logout(request)
-    form = UserForm(request.POST or None)
-    context = {
-        "form": form,
-    }
+
     return render(request, 'analyzer/upload.html')
