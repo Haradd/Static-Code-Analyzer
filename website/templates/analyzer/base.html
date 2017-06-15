@@ -14,12 +14,19 @@
     <nav class="navbar navbar-default">
       <div class="container-fluid">
           <ul class="nav navbar-nav">
-            <li><a href="{% url 'analyzer:reports' %}">Reports</a></li>
+            <li class="{% block reports_active %}{% endblock %}"><a href="{% url 'analyzer:reports' %}">Reports</a></li>
             <li><a href="{% url 'analyzer:upload' %}" > Add project <span class="glyphicon glyphicon-plus"></span></a></li>
           </ul>
-          <div class="nav navbar-nav navbar-right">
-            <a class="navbar-brand" href="#">Smart Code Analyzer</a>
-          </div>
+          <ul class="nav navbar-nav navbar-right">
+              {% if user.is_authenticated %}
+                <li><a href="{% url 'analyzer:logout' %}">Logout</a></li>
+              {% else %}
+                <li class="{% block register_active %}{% endblock %}"><a href="{% url 'analyzer:register' %}">Register</a></li>
+                <li class="{% block login_active %}{% endblock %}"><a href="{% url 'analyzer:login' %}">Login</a></li>
+              {% endif %}
+
+              <li><a class="navbar-brand" href="#">Smart Code Analyzer</a></li>
+          </ul>
 
       </div>
     </nav>
