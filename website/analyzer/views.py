@@ -64,6 +64,8 @@ def upload_form(request):
         report = Report()
         report.name = name
         report.file = '/media/reports/' + name + '.pdf'
+        if request.user.is_authenticated:
+            report.user = request.user
         report.save()
 
         print(Report.objects.all())
