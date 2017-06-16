@@ -1,3 +1,10 @@
+body{
+    background: white url("img/sayagata.png");
+}
+#loginform{
+    margin: 0 25%;
+}
+
 .navbar-nav{
     margin-left: 5%;
 }
@@ -6,4 +13,10 @@
 }
 #reports{
     margin: 2% 25%;
+}
+
+.btn-default{
+	border: 2px solid #0099cc;
+	color: #0066aa;
+
 }
