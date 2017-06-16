@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.core.files.storage import FileSystemStorage
 
@@ -11,7 +11,7 @@ import os
 
 def reports(request):
     if not request.user.is_authenticated():
-        return render(request, 'analyzer/login.html')
+        return redirect('/analyzer/login')
     else:
         reports_list = Report.objects.filter(user=request.user).order_by('-date')
         return render(request, 'analyzer/reports.html', {'reports_list': reports_list})
@@ -22,12 +22,13 @@ def upload_form(request):
 
     if request.method == 'POST' and request.FILES.getlist('pyfiles'):
 
-        #project name input validation
-        for report in Report.objects.all():
-            if report.name == request.POST['project-name']:
-                return render(request, 'analyzer/upload.html', {
-                    'error_message': 'Project already exists, try another name',
-                })
+        #project name input validation - only for registered users
+        if request.user.is_authenticated:
+            for report in Report.objects.filter(user=request.user):
+                if report.name == request.POST['project-name']:
+                    return render(request, 'analyzer/upload.html', {
+                        'error_message': 'Project already exists, try another name',
+                    })
 
         #.py files validation
         for file in request.FILES.getlist('pyfiles'):
@@ -53,7 +54,7 @@ def upload_form(request):
 
         name = request.POST['project-name']
         report_txt = BASE_DIR + '/media/report.txt'
-        report_pdf = BASE_DIR + '/media/reports/' + name + '.pdf'
+        report_pdf = BASE_DIR + '/media/reports/' + request.user.username + '/' + name + '.pdf'
         media_path = 'media/files/'
         make_pdf(report_txt, report_pdf, media_path, name)
 
@@ -61,7 +62,7 @@ def upload_form(request):
         #save report to database
         report = Report()
         report.name = name
-        report.file = '/media/reports/' + name + '.pdf'
+        report.file = '/media/reports/' + request.user.username + '/' + name + '.pdf'
         if request.user.is_authenticated:
             report.user = request.user
         report.save()
@@ -88,11 +89,12 @@ def register_user(request):
         user.set_password(password)
         user.save()
         user = authenticate(username=username, password=password)
+        BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        os.mkdir(BASE_DIR + '/media/reports/' + username)
         if user is not None:
             if user.is_active:
                 login(request, user)
-                reports_list = Report.objects.filter(user=request.user)
-                return render(request, 'analyzer/reports.html', {'reports_list': reports_list})
+                redirect('/analyzer/upload')
     return render(request, 'analyzer/register.html', {"form": form})
 
 
@@ -104,8 +106,7 @@ def login_user(request):
         if user is not None:
             if user.is_active:
                 login(request, user)
-                reports_list = Report.objects.filter(user=request.user).order_by('-date')
-                return render(request, 'analyzer/reports.html', {'reports_list': reports_list})
+                return redirect('/analyzer/upload')
             else:
                 return render(request, 'analyzer/login.html', {'error_message': 'Your account has been disabled'})
         else:
@@ -116,4 +117,4 @@ def login_user(request):
 def logout_user(request):
     logout(request)
 
-    return render(request, 'analyzer/upload.html')
+    return redirect('/analyzer/upload')
